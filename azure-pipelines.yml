@@ -1,0 +1,45 @@
+trigger:
+- main
+
+variables:
+  imageName: myapp
+  acrLoginServer: addconreg.azurecr.io
+
+stages:
+
+# 🔹 BUILD + PUSH IMAGE
+- stage: Build
+  jobs:
+  - job: BuildAndPush
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'azure-conn'
+        repository: '$(imageName)'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: latest
+
+# 🔹 DEPLOY TO AKS
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - job: DeployToAKS
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: 'azure-conn'
+        azureResourceGroup: 'rg-aks'
+        kubernetesCluster: 'adds-aks'
+        command: apply
+        useConfigurationFile: true
+        configuration: |
+          deployment.yaml
+          service.yaml
