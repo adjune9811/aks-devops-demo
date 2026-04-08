@@ -18,9 +18,9 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'acr-conn'
-        repository: 'myapp'
+        repository: '$(imageName)'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
+        Dockerfile: 'Dockerfile'
         tags: latest
 
 # 🔹 DEPLOY TO AKS
@@ -32,6 +32,13 @@ stages:
       vmImage: ubuntu-latest
 
     steps:
+
+    # 🔍 Debug step (optional but useful)
+    - script: |
+        echo "Listing files in working directory:"
+        ls -la
+      displayName: 'Check files'
+
     - task: Kubernetes@1
       inputs:
         connectionType: 'Azure Resource Manager'
