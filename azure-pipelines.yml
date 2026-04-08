@@ -34,6 +34,13 @@ stages:
 
     steps:
 
+    # 🔍 Debug (optional but useful)
+    - script: |
+        echo "FILES:"
+        ls -la
+      displayName: 'Check files'
+
+    # ✅ Apply deployment.yaml
     - task: Kubernetes@1
       inputs:
         connectionType: 'Azure Resource Manager'
@@ -42,11 +49,20 @@ stages:
         kubernetesCluster: 'adds-aks'
         command: apply
         useConfigurationFile: true
-        configuration: |
-          deployment.yaml
-          service.yaml
+        configuration: 'deployment.yaml'
 
-    # 🔥 THIS IS THE MAGIC STEP
+    # ✅ Apply service.yaml
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: 'azure-conn'
+        azureResourceGroup: 'rg-aks'
+        kubernetesCluster: 'adds-aks'
+        command: apply
+        useConfigurationFile: true
+        configuration: 'service.yaml'
+
+    # 🔥 Update image dynamically (IMPORTANT)
     - script: |
         kubectl set image deployment/myapp myapp=$(acrLoginServer)/$(imageName):$(Build.BuildId)
       displayName: 'Update image in AKS'
