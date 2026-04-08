@@ -21,7 +21,8 @@ stages:
         repository: '$(imageName)'
         command: 'buildAndPush'
         Dockerfile: 'Dockerfile'
-        tags: $(Build.BuildId)
+        tags: |
+          $(Build.BuildId)
 
 # 🔹 DEPLOY TO AKS
 - stage: Deploy
@@ -33,30 +34,19 @@ stages:
 
     steps:
 
-    # 🔍 Debug step
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: 'azure-conn'
+        azureResourceGroup: 'rg-aks'
+        kubernetesCluster: 'adds-aks'
+        command: apply
+        useConfigurationFile: true
+        configuration: |
+          deployment.yaml
+          service.yaml
+
+    # 🔥 THIS IS THE MAGIC STEP
     - script: |
-        echo "Listing files in working directory:"
-        ls -la
-      displayName: 'Check files'
-
-    # ✅ Apply deployment
-    - task: Kubernetes@1
-      inputs:
-        connectionType: 'Azure Resource Manager'
-        azureSubscriptionEndpoint: 'azure-conn'
-        azureResourceGroup: 'rg-aks'
-        kubernetesCluster: 'adds-aks'
-        command: apply
-        useConfigurationFile: true
-        configuration: 'deployment.yaml'
-
-    # ✅ Apply service
-    - task: Kubernetes@1
-      inputs:
-        connectionType: 'Azure Resource Manager'
-        azureSubscriptionEndpoint: 'azure-conn'
-        azureResourceGroup: 'rg-aks'
-        kubernetesCluster: 'adds-aks'
-        command: apply
-        useConfigurationFile: true
-        configuration: 'service.yaml'
+        kubectl set image deployment/myapp myapp=$(acrLoginServer)/$(imageName):$(Build.BuildId)
+      displayName: 'Update image in AKS'
