@@ -20,7 +20,7 @@ stages:
         containerRegistry: 'acr-conn'
         repository: 'myapp'
         command: 'buildAndPush'
-        Dockerfile: 'app/Dockerfile'
+        Dockerfile: '**/Dockerfile'
         tags: latest
 
 # 🔹 DEPLOY TO AKS
@@ -41,5 +41,5 @@ stages:
         command: apply
         useConfigurationFile: true
         configuration: |
-          app/deployment.yaml
-          app/service.yaml
+          deployment.yaml
+          service.yaml
