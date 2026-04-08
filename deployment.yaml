@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: addconreg.azurecr.io/myapp:latest   # ✅ base image only
-        imagePullPolicy: Always                   # ✅ always pull latest image
+        image: addconreg.azurecr.io/myapp:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
