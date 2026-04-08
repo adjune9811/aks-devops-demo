@@ -21,7 +21,7 @@ stages:
         repository: '$(imageName)'
         command: 'buildAndPush'
         Dockerfile: 'Dockerfile'
-        tags: latest
+        tags: $(Build.BuildId)
 
 # 🔹 DEPLOY TO AKS
 - stage: Deploy
