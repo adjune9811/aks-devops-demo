@@ -33,28 +33,30 @@ stages:
 
     steps:
 
-    # 🔍 Debug step (optional but useful)
+    # 🔍 Debug step
     - script: |
         echo "Listing files in working directory:"
         ls -la
       displayName: 'Check files'
 
+    # ✅ Apply deployment
     - task: Kubernetes@1
-  inputs:
-    connectionType: 'Azure Resource Manager'
-    azureSubscriptionEndpoint: 'azure-conn'
-    azureResourceGroup: 'rg-aks'
-    kubernetesCluster: 'adds-aks'
-    command: apply
-    useConfigurationFile: true
-    configuration: 'deployment.yaml'
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: 'azure-conn'
+        azureResourceGroup: 'rg-aks'
+        kubernetesCluster: 'adds-aks'
+        command: apply
+        useConfigurationFile: true
+        configuration: 'deployment.yaml'
 
-- task: Kubernetes@1
-  inputs:
-    connectionType: 'Azure Resource Manager'
-    azureSubscriptionEndpoint: 'azure-conn'
-    azureResourceGroup: 'rg-aks'
-    kubernetesCluster: 'adds-aks'
-    command: apply
-    useConfigurationFile: true
-    configuration: 'service.yaml'
+    # ✅ Apply service
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: 'azure-conn'
+        azureResourceGroup: 'rg-aks'
+        kubernetesCluster: 'adds-aks'
+        command: apply
+        useConfigurationFile: true
+        configuration: 'service.yaml'
