@@ -17,8 +17,8 @@ stages:
     steps:
     - task: Docker@2
       inputs:
-        containerRegistry: 'azure-conn'
-        repository: '$(imageName)'
+        containerRegistry: 'acr-conn'
+        repository: 'myapp'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         tags: latest
